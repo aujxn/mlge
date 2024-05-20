@@ -34,10 +34,10 @@ def embed(csr_mat: csr_matrix, dim: int, epsilon: float, gamma: float, beta: flo
             phi_min = gamma * (1.0/np.linalg.norm(x[i])+10.0/(1.0-np.linalg.norm(x[i])))
             for j in range(n):
                 if (j != i):
-                    phi_min += sigma / np.linalg.norm(x[i]-x[j])
+                    phi_min += sigma / np.linalg.norm(x[i]-x[j])**2.0
             for k in range(indptr[i], indptr[i+1]):
                 j=indices[k]
-                phi_min+= np.exp(data[k]) * beta * np.linalg.norm(x[i]-x[j])
+                phi_min+= data[k] * beta * np.linalg.norm(x[i]-x[j])
             a = -np.dot(x[i],direction)-np.sqrt(np.dot(x[i],direction)**2+1.0-np.linalg.norm(x[i])**2)
             b = -np.dot(x[i],direction)+np.sqrt(np.dot(x[i],direction)**2+1.0-np.linalg.norm(x[i])**2)
             # logging.debug('a:', a, 'b:',b, 'b-a:', b-a)
@@ -48,10 +48,10 @@ def embed(csr_mat: csr_matrix, dim: int, epsilon: float, gamma: float, beta: flo
                     phi = gamma * (1.0/np.linalg.norm(z)+10.0/(1.0-np.linalg.norm(z)))
                     for j in range(0,n):
                         if (j != i):
-                            phi += sigma / np.linalg.norm(z-x[j])
+                            phi += sigma / np.linalg.norm(z-x[j])**2.0
                     for l in range(indptr[i], indptr[i+1]):
                         j=indices[l]
-                        phi += np.exp(data[l]) * beta * np.linalg.norm(z-x[j])
+                        phi += data[l] * beta * np.linalg.norm(z-x[j])
                     if (phi<phi_min):
                         t_star=t
                         phi_min = phi
@@ -132,9 +132,9 @@ def visualize_plotly(positions, labels, truth=None):
 
     n = len(positions)
     if truth is None:
-        colors = [1]*n
+        colors = None
     else:
-        colors = truth 
+        colors = [str(val) for val in truth]
 
     if positions.shape[1] == 2:
         fig = px.scatter(x=positions[:,0], y=positions[:,1], hover_name=labels, color=colors, size=[3]*n)
@@ -167,17 +167,16 @@ class Embedding:
             x[i] /= np.linalg.norm(x[i])
             x[i] *= np.random.random(1)
         self.positions = x
-        #self.positions = embed(csr, dim, epsilon, gamma, beta, sigma, m, max_iter)
+        #self.positions = embed(csr, dim, 1e-2, gamma, beta, sigma, 30, max_iter)
         if classes is not None:
             self.classes = classes
 
     def visualize(self):
         visualize_plotly(self.positions, self.graph.labels, truth=self.classes)
 
-    '''
     def embed(self):
         for iteration in range(self.max_iter):
-            update = self.get_update_directions()
+            update = self.get_update_directions(self.positions, 0)
             max_dist = 0.0
             for d in update:
                 magnitude = np.linalg.norm(d) 
@@ -185,9 +184,8 @@ class Embedding:
             logging.debug(f"iter: {iteration}, max_dist: {max_dist:.2e}")
             self.positions += update
 
-            if iteration % 100 == 0:
+            if iteration % 1000 == 0:
                 self.visualize()
-    '''
 
     def embed_ml(self):
         for i in range(50):

@@ -127,11 +127,22 @@ def modularity_matching(adj, coarsening_factor):
             return adjacency_mats, interpolation_mats
 
 class Hierarchy:
-    def __init__(self, graph: Graph, coarsening_factor):
+    def __init__(self, graph: Graph, coarsening_factor, use_metis):
 
-        coarse_mats, interpolations = modularity_matching(graph.adjacency_mat, coarsening_factor)
-        self.adjacency_mats = coarse_mats
-        self.interpolation_mats = interpolations
+        if use_metis:
+            self.adjacency_mats = [graph.adjacency_mat]
+            self.interpolation_mats = []
+            current_graph = graph
+            for i in range(1):
+                p, coarse_mat, _ = current_graph.partition_metis(2.0)
+                # this might not work since diagonal needs to be removed for metis
+                current_graph = Graph(None, coarse_mat)
+                self.interpolation_mats.append(p)
+                self.adjacency_mats.append(coarse_mat)
+        else:
+            coarse_mats, interpolations = modularity_matching(graph.adjacency_mat, coarsening_factor)
+            self.adjacency_mats = coarse_mats
+            self.interpolation_mats = interpolations
         
 
 
