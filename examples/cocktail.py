@@ -30,12 +30,17 @@ def main():
     logging.info(f"Built hierarchy with {len(hierarchy.adjacency_mats)} levels in {elapsed:.1f} seconds")
 
     colors = []
+    coarsest_p = hierarchy.interpolation_mats[0]
+    for p in hierarchy.interpolation_mats[1:]:
+        coarsest_p = coarsest_p @ p
+
     for i in range(n):
-        colors.append(hierarchy.adjacency_mats[0].getrow(i).indices[0])
+        colors.append(coarsest_p.getrow(i).indices[0])
 
     start_time = time.time()
-    embedding = Embedding(network, m=50, max_iter=50, classes=colors)
+    embedding = Embedding(network, classes=colors, hierarchy=hierarchy)
     elapsed = time.time() - start_time
+    embedding.embed_ml()
     logging.info(f"Built embedding in {elapsed:.1f} seconds")
     embedding.visualize()
 

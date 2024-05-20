@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from setuptools import setup, find_packages, find_namespace_packages
+from setuptools import setup, find_namespace_packages
 
 setup(name="mlge",
       version="1.0",
@@ -9,6 +9,7 @@ setup(name="mlge",
       package_dir={' ': 'mlge'},
       install_requires=['numpy',
                         'scipy',
-                        'pyvista'],
+                        'pyvista',
+                        'pymetis'],
       python_requires='>=3.6'
       )
