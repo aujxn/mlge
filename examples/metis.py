@@ -24,8 +24,6 @@ def main():
 
     hierarchy = Hierarchy(network, 2.0, True)
 
-    #embedding = Embedding(network, classes=partition[1], dim=3, gamma=1e2, beta=5e5, sigma=1e0, max_iter=100)
-    embedding = Embedding(network, )
     coarsest_p = hierarchy.interpolation_mats[0]
     print(coarsest_p.shape)
     for p in hierarchy.interpolation_mats[1:]:
