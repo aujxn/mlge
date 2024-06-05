@@ -127,7 +127,7 @@ def modularity_matching(adj, coarsening_factor):
             return adjacency_mats, interpolation_mats
 
 class Hierarchy:
-    def __init__(self, graph: Graph, coarsening_factor, use_metis):
+    def __init__(self, graph: Graph, coarsening_factor, use_metis=False):
 
         if use_metis:
             self.adjacency_mats = [graph.adjacency_mat]

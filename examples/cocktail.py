@@ -1,5 +1,4 @@
 from scipy.io import mmread
-import numpy as np
 import time
 from mlge.graph import Graph
 from mlge.hierarchy import Hierarchy
